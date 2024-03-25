@@ -69,8 +69,8 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {},
-    extraReducers: (buider) => {
-        buider
+    extraReducers: (builder) => {
+        builder
             .addCase(createAccount.fulfilled, (state, action) => {
                 state.data = action?.payload?.data
                 if (action?.payload?.data) {
