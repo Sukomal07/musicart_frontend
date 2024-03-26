@@ -1,15 +1,19 @@
 import Cookies from "js-cookie";
+import { useEffect } from "react";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 
 import Logo from '../assets/logo.png'
 import { logout } from "../redux/slices/Authslice";
+import { getCart } from "../redux/slices/CartSlice";
 import style from '../styles/navbar.module.css'
 function Navbar() {
     const location = useLocation()
     const dispatch = useDispatch()
     const { data } = useSelector((state) => state.auth)
+    const { items = [] } = useSelector((state) => state.cart?.cart) || {};
+
     let timeoutId;
     const handleMouseOver = () => {
         clearTimeout(timeoutId);
@@ -32,8 +36,16 @@ function Navbar() {
     }
     async function handleLogout() {
         await dispatch(logout())
+        await dispatch(getCart())
         Cookies.remove('authToken')
+        handleMouseOut()
     }
+    useEffect(() => {
+        const fetchData = async () => {
+            await dispatch(getCart())
+        }
+        fetchData()
+    }, [])
     return (
         <div className={style.navbar}>
             <div className={style.flex}>
@@ -52,7 +64,7 @@ function Navbar() {
                         <AiOutlineShoppingCart size={'20px'} />
                         View Cart
                     </div>
-                    <p>0</p>
+                    <p>{items?.length || 0}</p>
                 </div>
                 {location.pathname === "/" && data?.name && (
                     <div className={style.user} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>

@@ -61,6 +61,7 @@
   cursor: pointer;
 }
 .popup {
+  z-index: 5;
   position: absolute;
   top: 55px;
   right: -26px;

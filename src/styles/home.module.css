@@ -3,7 +3,6 @@
   flex-direction: column;
   gap: 30px;
   padding: 20px 4rem;
-  margin-bottom: 8rem;
 }
 .banner {
   display: flex;
@@ -52,7 +51,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  width: 150px;
+  width: 100px;
   height: 35px;
 }
 .filter_option {
@@ -99,6 +98,10 @@
   padding: 5px 13px;
 }
 .option > ul > li:hover {
+  color: white;
+  background-color: #0066ff;
+}
+.active {
   color: white;
   background-color: #0066ff;
 }
@@ -175,6 +178,7 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
   padding: 20px 0;
+  min-height: 250px;
 }
 .product {
   display: flex;
@@ -227,6 +231,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 20px 0;
+  min-height: 250px;
 }
 .product_list {
   display: flex;

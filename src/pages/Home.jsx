@@ -1,22 +1,26 @@
+import { Icon } from '@iconify/react'
 import { useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
-import { FaList } from "react-icons/fa";
 import { IoGrid, IoGridOutline } from "react-icons/io5";
 import { MdAddShoppingCart } from "react-icons/md";
 import { TfiViewListAlt } from "react-icons/tfi";
 import { VscChevronDown, VscChevronUp } from "react-icons/vsc";
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { useDebounce } from 'use-debounce';
 
 import homeImage from '../assets/home_image.png'
 import Layout from "../layout/Layout"
-import { getAllProduct, searchProduct } from "../redux/slices/ProductSlice";
+import { addToCart } from "../redux/slices/CartSlice.js";
+import { filterProducts, getAllProduct, searchProduct } from "../redux/slices/ProductSlice.js";
 import style from '../styles/home.module.css'
 
 function Home() {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [query, setQuery] = useState('');
     const [debouncedQuery] = useDebounce(query, 200);
+    const { data } = useSelector((state) => state.auth)
     const [showDropdowns, setShowDropdowns] = useState({
         headphoneTypes: false,
         company: false,
@@ -33,6 +37,7 @@ function Home() {
     });
     const [product, setProduct] = useState([])
     const [view, setView] = useState('grid');
+
     const handleSelect = (filter, value) => {
         setSelectedValues({
             ...selectedValues,
@@ -58,6 +63,43 @@ function Home() {
     const handleSearchInputChange = (event) => {
         setQuery(event.target.value);
     };
+    const formatFilterValue = (value) => {
+        let formattedValue = value?.toLowerCase()?.trim();
+
+        if (formattedValue?.endsWith(' headphone')) {
+            formattedValue = formattedValue?.slice(0, -10);
+        }
+
+        return formattedValue;
+    };
+
+    const filterData = async () => {
+        const filters = {
+            type: formatFilterValue(selectedValues.headphoneTypes),
+            company: formatFilterValue(selectedValues.company),
+            colour: formatFilterValue(selectedValues.colour),
+            price: formatFilterValue(selectedValues.price),
+            sortBy: formatFilterValue(selectedValues.sortBy)
+        };
+        Object.keys(filters).forEach((key) => filters[key] === '' && delete filters[key]);
+        if (Object.keys(filters).length > 0) {
+            const res = await dispatch(filterProducts(filters));
+            const filteredProducts = res?.payload?.data;
+            setProduct(filteredProducts?.length > 0 ? filteredProducts : null);
+        } else {
+            const res = await dispatch(getAllProduct());
+            setProduct(res?.payload?.data);
+        }
+    };
+
+    const handleSelectProduct = async (productId) => {
+        const newCartItem = { productId, quantity: 1 };
+        if (data?._id) {
+            await dispatch(addToCart(newCartItem));
+        } else {
+            navigate('/login')
+        }
+    };
 
     useEffect(() => {
         if (debouncedQuery) {
@@ -74,6 +116,11 @@ function Home() {
             fetchData();
         }
     }, [debouncedQuery, dispatch]);
+
+    useEffect(() => {
+        filterData()
+    }, [selectedValues])
+
     return (
         <Layout>
             <section className={style.home_container}>
@@ -96,12 +143,12 @@ function Home() {
                         {view === 'grid' ? (
                             <>
                                 <IoGrid size={23} cursor={'pointer'} />
-                                <TfiViewListAlt size={22} cursor={'pointer'} onClick={toggleView} />
+                                <TfiViewListAlt size={21} cursor={'pointer'} onClick={toggleView} />
                             </>
                         ) : (
                             <>
                                 <IoGridOutline size={22} cursor={'pointer'} onClick={toggleView} />
-                                <FaList size={25} cursor={'pointer'} />
+                                <Icon icon={"material-symbols:view-list-rounded"} width={28} cursor={'pointer'} />
                             </>
                         )}
 
@@ -112,9 +159,10 @@ function Home() {
                             {showDropdowns.headphoneTypes ? <VscChevronUp size={20} /> : <VscChevronDown size={20} />}
                             {showDropdowns.headphoneTypes && (
                                 <ul className={style.headphone_types}>
-                                    <li onClick={() => handleSelect('headphoneTypes', 'In-ear headphone')}>In-ear headphone</li>
-                                    <li onClick={() => handleSelect('headphoneTypes', 'On-ear headphone')}>On-ear headphone</li>
-                                    <li onClick={() => handleSelect('headphoneTypes', 'Over-ear headphone')}>Over-ear headphone</li>
+                                    <li onClick={() => handleSelect('headphoneTypes', '')}>Featured</li>
+                                    <li onClick={() => handleSelect('headphoneTypes', 'In-ear headphone')} className={selectedValues.headphoneTypes === 'In-ear headphone' ? style.active : ''}>In-ear headphone</li>
+                                    <li onClick={() => handleSelect('headphoneTypes', 'On-ear headphone')} className={selectedValues.headphoneTypes === 'On-ear headphone' ? style.active : ''}>On-ear headphone</li>
+                                    <li onClick={() => handleSelect('headphoneTypes', 'Over-ear headphone')} className={selectedValues.headphoneTypes === 'Over-ear headphone' ? style.active : ''}>Over-ear headphone</li>
                                 </ul>
                             )}
                         </div>
@@ -123,12 +171,13 @@ function Home() {
                             {showDropdowns.company ? <VscChevronUp size={20} /> : <VscChevronDown size={20} />}
                             {showDropdowns.company && (
                                 <ul className={style.company}>
-                                    <li onClick={() => handleSelect('company', 'Jbl')}>Jbl</li>
-                                    <li onClick={() => handleSelect('company', 'Sony')}>Sony</li>
-                                    <li onClick={() => handleSelect('company', 'Boat')}>Boat</li>
-                                    <li onClick={() => handleSelect('company', 'Zebronics')}>Zebronics</li>
-                                    <li onClick={() => handleSelect('company', 'Marshall')}>Marshall</li>
-                                    <li onClick={() => handleSelect('company', 'Ptron')}>Ptron</li>
+                                    <li onClick={() => handleSelect('company', '')}>Featured</li>
+                                    <li onClick={() => handleSelect('company', 'Jbl')} className={selectedValues.company === 'Jbl' ? style.active : ''}>Jbl</li>
+                                    <li className={selectedValues.company === 'Sony' ? style.active : ''} onClick={() => handleSelect('company', 'Sony')}>Sony</li>
+                                    <li className={selectedValues.company === 'Boat' ? style.active : ''} onClick={() => handleSelect('company', 'Boat')}>Boat</li>
+                                    <li className={selectedValues.company === 'Zebronics' ? style.active : ''} onClick={() => handleSelect('company', 'Zebronics')}>Zebronics</li>
+                                    <li className={selectedValues.company === 'Marshall' ? style.active : ''} onClick={() => handleSelect('company', 'Marshall')}>Marshall</li>
+                                    <li className={selectedValues.company === 'Ptron' ? style.active : ''} onClick={() => handleSelect('company', 'Ptron')}>Ptron</li>
                                 </ul>
                             )}
                         </div>
@@ -137,10 +186,11 @@ function Home() {
                             {showDropdowns.colour ? <VscChevronUp size={20} /> : <VscChevronDown size={20} />}
                             {showDropdowns.colour && (
                                 <ul className={style.colour}>
-                                    <li onClick={() => handleSelect('colour', 'Blue')}>Blue</li>
-                                    <li onClick={() => handleSelect('colour', 'Black')}>Black</li>
-                                    <li onClick={() => handleSelect('colour', 'White')}>White</li>
-                                    <li onClick={() => handleSelect('colour', 'Brown')}>Brown</li>
+                                    <li onClick={() => handleSelect('colour', '')}>Featured</li>
+                                    <li className={selectedValues.colour === 'Blue' ? style.active : ''} onClick={() => handleSelect('colour', 'Blue')}>Blue</li>
+                                    <li className={selectedValues.colour === 'Black' ? style.active : ''} onClick={() => handleSelect('colour', 'Black')}>Black</li>
+                                    <li className={selectedValues.colour === 'White' ? style.active : ''} onClick={() => handleSelect('colour', 'White')}>White</li>
+                                    <li className={selectedValues.colour === 'Brown' ? style.active : ''} onClick={() => handleSelect('colour', 'Brown')}>Brown</li>
                                 </ul>
                             )}
                         </div>
@@ -149,9 +199,10 @@ function Home() {
                             {showDropdowns.price ? <VscChevronUp size={20} /> : <VscChevronDown size={20} />}
                             {showDropdowns.price && (
                                 <ul className={style.price}>
-                                    <li onClick={() => handleSelect('price', '0 - 1000')}>₹0 - ₹10,00</li>
-                                    <li onClick={() => handleSelect('price', '1000 - 10000')}>₹1,000 - ₹10,000</li>
-                                    <li onClick={() => handleSelect('price', '10000 - 20000')}>₹10,000 - ₹20,000</li>
+                                    <li onClick={() => handleSelect('price', '')}>Featured</li>
+                                    <li className={selectedValues.price === '0 - 1000' ? style.active : ''} onClick={() => handleSelect('price', '0 - 1000')}>₹0 - ₹10,00</li>
+                                    <li className={selectedValues.price === '1000 - 10000' ? style.active : ''} onClick={() => handleSelect('price', '1000 - 10000')}>₹1,000 - ₹10,000</li>
+                                    <li className={selectedValues.price === '10000 - 20000' ? style.active : ''} onClick={() => handleSelect('price', '10000 - 20000')}>₹10,000 - ₹20,000</li>
                                 </ul>
                             )}
                         </div>
@@ -161,10 +212,11 @@ function Home() {
                         {showDropdowns.sortBy ? <VscChevronUp size={20} /> : <VscChevronDown size={20} />}
                         {showDropdowns.sortBy && (
                             <ul className={style.sort_types}>
+                                <li onClick={() => handleSelect('sortBy', '')}>Featured</li>
                                 <li onClick={() => handleSelect('sortBy', 'Lowest')}>Price : Lowest</li>
                                 <li onClick={() => handleSelect('sortBy', 'Highest')}>Price : Highest</li>
-                                <li onClick={() => handleSelect('sortBy', '(A-Z)')}>Name : (A-Z)</li>
-                                <li onClick={() => handleSelect('sortBy', '(Z-A)')}>Name : (Z-A)</li>
+                                <li onClick={() => handleSelect('sortBy', 'A-Z')}>Name : (A-Z)</li>
+                                <li onClick={() => handleSelect('sortBy', 'Z-A')}>Name : (Z-A)</li>
                             </ul>
                         )}
                     </div>
@@ -174,7 +226,7 @@ function Home() {
                         <div key={item?._id} className={view === 'grid' ? style.product : style.product_list}>
                             <div className={view === 'grid' ? style.image_container : style.list_image_container}>
                                 <img src={item?.pictures[0]} alt={item?.name} className={view === 'grid' ? style.product_image : style.list_product_image} />
-                                <div className={style.cart}>
+                                <div className={style.cart} onClick={() => handleSelectProduct(item?._id)}>
                                     <MdAddShoppingCart size={20} color="#1d7000" />
                                 </div>
                             </div>
