@@ -92,12 +92,21 @@ function Home() {
         }
     };
 
-    const handleSelectProduct = async (productId) => {
+    const handleSelectProduct = async (event, productId) => {
+        event.stopPropagation()
         const newCartItem = { productId, quantity: 1 };
         if (data?._id) {
             await dispatch(addToCart(newCartItem));
         } else {
             navigate('/login')
+        }
+    };
+
+    const handleProductClick = (event, data) => {
+        if (view === 'grid') {
+            navigate(`/product/${data?._id}`, { state: data });
+        } else if (view === 'list' && event.target?.classList.contains(style.details)) {
+            navigate(`/product/${data?._id}`, { state: data });
         }
     };
 
@@ -223,10 +232,10 @@ function Home() {
                 </div>
                 <div className={view === 'grid' ? style.grid_product_container : style.list_product_container}>
                     {product ? product?.map((item) => (
-                        <div key={item?._id} className={view === 'grid' ? style.product : style.product_list}>
+                        <div key={item?._id} className={view === 'grid' ? style.product : style.product_list} onClick={(event) => handleProductClick(event, item)}>
                             <div className={view === 'grid' ? style.image_container : style.list_image_container}>
                                 <img src={item?.pictures[0]} alt={item?.name} className={view === 'grid' ? style.product_image : style.list_product_image} />
-                                <div className={style.cart} onClick={() => handleSelectProduct(item?._id)}>
+                                <div className={style.cart} onClick={(event) => handleSelectProduct(event, item?._id)}>
                                     <MdAddShoppingCart size={20} color="#1d7000" />
                                 </div>
                             </div>
@@ -237,7 +246,7 @@ function Home() {
                                 {
                                     view === 'list' && (
                                         <>
-                                            <p className={style.p}>{item?.about}</p>
+                                            <p className={style.p}>{item?.description}</p>
                                             <span className={style.details}>Details</span>
                                         </>
                                     )

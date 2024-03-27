@@ -6,6 +6,7 @@ import { Route, Routes } from 'react-router-dom'
 import UnprotectedRoute from './components/UnprotectedRoute'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Product from './pages/Product'
 import Signup from './pages/Signup'
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/login' element={<Login />} />
       </Route>
       <Route path='/' element={<Home />} />
+      <Route path='/product/:productId' element={<Product />} />
     </Routes>
   )
 }

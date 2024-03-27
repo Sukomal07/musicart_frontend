@@ -11,6 +11,7 @@ import style from '../styles/navbar.module.css'
 function Navbar() {
     const location = useLocation()
     const dispatch = useDispatch()
+    const { state } = location || {};
     const { data } = useSelector((state) => state.auth)
     const { items = [] } = useSelector((state) => state.cart?.cart) || {};
 
@@ -54,8 +55,14 @@ function Navbar() {
                     <h1 className={style.logo_text}>Musicart</h1>
                 </div>
                 <div className={style.nav_links}>
-                    <Link to={'/'} className={style.link}>Home</Link>
-                    <Link to={'/invoice'} className={style.link}>Invoice</Link>
+                    {location.pathname === '/' ? (
+                        <>
+                            <Link to={'/'} className={style.link}>Home</Link>
+                            <Link to={'/invoice'} className={style.link}>Invoice</Link>
+                        </>
+                    ) : (
+                        <span>Home / {state?.name}</span>
+                    )}
                 </div>
             </div>
             <div className={style.flex}>

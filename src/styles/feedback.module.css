@@ -15,7 +15,7 @@
   background-color: white;
   padding: 20px;
   border-radius: 15px;
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 20px;
   box-shadow: 0px 0px 8px #616161;
@@ -49,16 +49,10 @@
   border-radius: 5px;
   cursor: pointer;
   background-color: #f3f3f3;
-}
-.input {
-  outline: none;
-  font-size: 15px;
-  width: 100%;
-  border: none;
-  background-color: transparent;
   color: #919191;
-  cursor: pointer;
+  text-transform: capitalize;
 }
+
 .textarea {
   outline: none;
   font-size: 15px;
@@ -76,7 +70,7 @@
   padding: 7px 23px;
   width: max-content;
   margin: 0 auto;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 20px;
   border: none;
 }
@@ -107,7 +101,16 @@
   color: white;
   background-color: #0066ff;
 }
+.active {
+  color: white;
+  background-color: #0066ff;
+}
 .hr {
   width: 100%;
   color: #dddddd;
+}
+.error {
+  font-size: 12px;
+  color: red;
+  padding: 0 10px;
 }

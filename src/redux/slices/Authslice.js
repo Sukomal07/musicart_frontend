@@ -65,6 +65,24 @@ export const logout = createAsyncThunk("auth/logout", async () => {
     }
 })
 
+export const sendFeedback = createAsyncThunk('/auth/feedback', async (data) => {
+    try {
+        const res = axiosInstance.post("/user/send_feedback", data);
+        toast.promise(res, {
+            loading: "Sending...",
+            success: (data) => {
+                return data?.data?.message;
+            },
+            error: (error) => {
+                return error?.response?.data?.message
+            },
+        });
+        return (await res).data
+    } catch (error) {
+        console.log(error.message)
+    }
+})
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
