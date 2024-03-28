@@ -10,8 +10,9 @@ import { useNavigate } from 'react-router-dom'
 import { useDebounce } from 'use-debounce';
 
 import homeImage from '../assets/home_image.png'
+import Feedback from '../components/Feedback.jsx';
 import Layout from "../layout/Layout"
-import { addToCart } from "../redux/slices/CartSlice.js";
+import { addToCart, getCart } from "../redux/slices/CartSlice.js";
 import { filterProducts, getAllProduct, searchProduct } from "../redux/slices/ProductSlice.js";
 import style from '../styles/home.module.css'
 
@@ -94,9 +95,10 @@ function Home() {
 
     const handleSelectProduct = async (event, productId) => {
         event.stopPropagation()
-        const newCartItem = { productId, quantity: 1 };
+        const newCartItem = { productId };
         if (data?._id) {
             await dispatch(addToCart(newCartItem));
+            await dispatch(getCart())
         } else {
             navigate('/login')
         }
@@ -258,6 +260,7 @@ function Home() {
                     )}
                 </div>
             </section>
+            <Feedback />
         </Layout>
     )
 }

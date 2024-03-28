@@ -34,6 +34,15 @@ export const filterProducts = createAsyncThunk('/product/filter', async (filters
     }
 })
 
+export const checkout = createAsyncThunk('/product/checkout', async (data) => {
+    try {
+        const res = await axiosInstance.post("/invoice/create_invoice", data)
+        return res.data
+    } catch (error) {
+        console.error(error.message)
+    }
+})
+
 const productSlice = createSlice({
     name: 'product',
     initialState,

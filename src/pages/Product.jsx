@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import star from '../assets/Star.png'
 import Layout from "../layout/Layout"
-import { addToCart } from '../redux/slices/CartSlice'
+import { addToCart, getCart } from '../redux/slices/CartSlice'
 import style from '../styles/product.module.css'
 
 function Product() {
@@ -41,15 +41,16 @@ function Product() {
     };
 
     const handleAddToCart = async (productId) => {
-        const newCartItem = { productId, quantity: 1 };
+        const newCartItem = { productId };
         if (data?._id) {
             await dispatch(addToCart(newCartItem));
+            await dispatch(getCart())
         } else {
             navigate('/login')
         }
     };
     const handleBuyNow = async (productId) => {
-        const newCartItem = { productId, quantity: 1 };
+        const newCartItem = { productId };
         if (data?._id) {
             await dispatch(addToCart(newCartItem));
             navigate('/cart')

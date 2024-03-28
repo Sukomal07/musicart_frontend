@@ -1,4 +1,3 @@
-import Feedback from "../components/Feedback"
 import Footer from "../components/Footer"
 import Header from "../components/Header"
 import Navbar from "../components/Navbar"
@@ -11,7 +10,6 @@ function Layout({ children }) {
             <Navbar />
             {children}
             <Footer />
-            <Feedback />
         </div>
     )
 }

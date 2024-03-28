@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import Logo from '../assets/logo.png'
 import { logout } from "../redux/slices/Authslice";
@@ -10,10 +10,11 @@ import { getCart } from "../redux/slices/CartSlice";
 import style from '../styles/navbar.module.css'
 function Navbar() {
     const location = useLocation()
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { state } = location || {};
     const { data } = useSelector((state) => state.auth)
-    const { items = [] } = useSelector((state) => state.cart?.cart) || {};
+    const { totalCartCount } = useSelector((state) => state.cart?.cart) || 0;
 
     let timeoutId;
     const handleMouseOver = () => {
@@ -41,6 +42,20 @@ function Navbar() {
         Cookies.remove('authToken')
         handleMouseOut()
     }
+
+    function getPageTitle(pathname, state) {
+        switch (pathname) {
+            case '/cart':
+                return 'View Cart';
+            case '/checkout':
+                return 'Checkout';
+            case '/invoices':
+                return 'Invoices';
+            default:
+                return state?.name || '';
+        }
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             await dispatch(getCart())
@@ -61,18 +76,24 @@ function Navbar() {
                             <Link to={'/invoice'} className={style.link}>Invoice</Link>
                         </>
                     ) : (
-                        <span>Home / {state?.name}</span>
+                        <span>Home / {getPageTitle(location.pathname, state)}</span>
                     )}
                 </div>
             </div>
             <div className={style.flex}>
-                <div className={style.cart}>
-                    <div>
-                        <AiOutlineShoppingCart size={'20px'} />
-                        View Cart
-                    </div>
-                    <p>{items?.length || 0}</p>
-                </div>
+                {
+                    location.pathname !== "/checkout" && (
+                        <div className={style.cart} onClick={() => navigate('/cart')}>
+                            <div>
+                                <AiOutlineShoppingCart size={'20px'} />
+                                View Cart
+                            </div>
+                            {location.pathname !== "/cart" && (
+                                <p>{totalCartCount || 0}</p>
+                            )}
+                        </div>
+                    )
+                }
                 {location.pathname === "/" && data?.name && (
                     <div className={style.user} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                         <p>{modifyName(data?.name)}</p>
