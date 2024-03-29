@@ -3,8 +3,9 @@ import { VscChevronDown, VscChevronUp } from "react-icons/vsc"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
+import Successfull from "../components/Successfull"
 import Layout from '../layout/Layout'
-import { checkout } from "../redux/slices/ProductSlice"
+import { checkout } from "../redux/slices/InvoiceSlice"
 import style from '../styles/checkout.module.css'
 
 function Checkout() {
@@ -15,6 +16,7 @@ function Checkout() {
     const { items } = useSelector((state) => state.cart?.cart) || []
     const [index, setIndex] = useState(0)
     const [showDropdown, setShowDropdown] = useState(false)
+    const [success, setSuccess] = useState(false)
     const [data, setData] = useState({
         address: '',
         payment_method: '',
@@ -46,16 +48,22 @@ function Checkout() {
     }
 
     const handleSelect = (method) => {
+        const newOrderTotal = calculateTotal(totalCartPrice);
+
         setData((prevData) => ({
             ...prevData,
-            payment_method: method
-        }))
+            payment_method: method,
+            orderTotal: newOrderTotal
+        }));
+
         setErrors((prevData) => ({
             ...prevData,
             payment_method: ''
-        }))
-        handleToggle()
+        }));
+
+        handleToggle();
     }
+
     function format(str) {
         switch (str) {
             case 'pay_on_delivery':
@@ -80,10 +88,6 @@ function Checkout() {
             isValid = false
             newErrors.payment_method = 'Payment method is required'
         }
-        setData((prevData) => ({
-            ...prevData,
-            orderTotal: calculateTotal(totalCartPrice)
-        }))
         if (isValid && data.orderTotal > 0) {
             const res = await dispatch(checkout(data))
             if (res?.payload?.success) {
@@ -92,6 +96,7 @@ function Checkout() {
                     payment_method: '',
                     orderTotal: 0
                 })
+                setSuccess(true)
             }
         } else {
             setErrors(newErrors)
@@ -100,7 +105,7 @@ function Checkout() {
     return (
         <Layout>
             <section className={style.checkout_container}>
-                <span onClick={() => navigate('/')} className={style.back_btn}>Back to cart</span>
+                <span onClick={() => navigate('/cart')} className={style.back_btn}>Back to cart</span>
                 <h2 className={style.checkout}>Checkout</h2>
                 <div style={{ display: 'flex' }}>
                     <div className={style.checkout_details}>
@@ -189,6 +194,11 @@ function Checkout() {
                     </div>
                 </div>
             </section>
+            {
+                success && (
+                    <Successfull />
+                )
+            }
         </Layout>
     )
 }

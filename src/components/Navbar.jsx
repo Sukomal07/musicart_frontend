@@ -52,6 +52,9 @@ function Navbar() {
             case '/invoices':
                 return 'Invoices';
             default:
+                if (pathname.startsWith('/invoices/')) {
+                    return 'Invoices';
+                }
                 return state?.name || '';
         }
     }
@@ -65,7 +68,7 @@ function Navbar() {
     return (
         <div className={style.navbar}>
             <div className={style.flex}>
-                <div className={style.logo_container}>
+                <div className={style.logo_container} onClick={() => navigate('/')}>
                     <img src={Logo} alt="logo" className={style.logo_image} />
                     <h1 className={style.logo_text}>Musicart</h1>
                 </div>
@@ -73,7 +76,7 @@ function Navbar() {
                     {location.pathname === '/' ? (
                         <>
                             <Link to={'/'} className={style.link}>Home</Link>
-                            <Link to={'/invoice'} className={style.link}>Invoice</Link>
+                            <Link to={'/invoices'} className={style.link}>Invoice</Link>
                         </>
                     ) : (
                         <span>Home / {getPageTitle(location.pathname, state)}</span>
@@ -82,13 +85,13 @@ function Navbar() {
             </div>
             <div className={style.flex}>
                 {
-                    location.pathname !== "/checkout" && (
+                    location.pathname !== "/checkout" && !location.pathname.startsWith("/invoices/") && (
                         <div className={style.cart} onClick={() => navigate('/cart')}>
                             <div>
                                 <AiOutlineShoppingCart size={'20px'} />
                                 View Cart
                             </div>
-                            {location.pathname !== "/cart" && (
+                            {location.pathname !== "/cart" && location.pathname !== "/invoices" && (
                                 <p>{totalCartCount || 0}</p>
                             )}
                         </div>
