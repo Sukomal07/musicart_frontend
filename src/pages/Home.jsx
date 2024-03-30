@@ -311,7 +311,7 @@ function Home() {
                     )
                 }
                 <div className={view === 'grid' ? style.grid_product_container : style.list_product_container}>
-                    {product ? product?.map((item) => (
+                    {product?.length > 0 ? product?.map((item) => (
                         <div key={item?._id} className={view === 'grid' ? style.product : style.product_list} onClick={(event) => handleProductClick(event, item)}>
                             <div className={view === 'grid' ? style.image_container : style.list_image_container}>
                                 <img src={item?.pictures[0]} alt={item?.name} className={view === 'grid' ? style.product_image : style.list_product_image} />
