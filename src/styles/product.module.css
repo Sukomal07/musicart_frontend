@@ -135,6 +135,9 @@
     align-items: center;
     box-shadow: 0px 0px 8px #ccc;
   }
+  .column {
+    padding: 20px 0px 7rem 0px;
+  }
   .buy {
     padding: 15px;
     font-size: 20px;
