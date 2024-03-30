@@ -1,4 +1,6 @@
+import { Icon } from '@iconify/react'
 import { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { useSelector } from "react-redux"
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -31,13 +33,21 @@ function InvoiceDetails() {
             return amount - 45
         }
     }
-    console.log(state);
+
     return (
         <Layout>
             <section className={style.checkout_container}>
-                <span onClick={() => navigate('/invoices')} className={style.back_btn}>Back to invoices</span>
+                {
+                    isMobile ? (
+                        <span onClick={() => navigate('/invoices')} className={style.back_btn}>
+                            <Icon icon="mdi:arrow-left" color='black' width={30} fontWeight={600} />
+                        </span>
+                    ) : (
+                        <span onClick={() => navigate('/invoices')} className={style.back_btn}>Back to invoices</span>
+                    )
+                }
                 <h2 className={style.checkout}>Invoice</h2>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex' }} className={style.address_container}>
                     <div className={style.checkout_details}>
                         <div className={style.user_details}>
                             <div className={style.space}>
@@ -81,18 +91,18 @@ function InvoiceDetails() {
                         <div className={style.order_summary}>
                             <h3>Order Summary</h3>
                             <div className={style.price_div}>
-                                <div className={style.space}>
+                                <div className={style.order_total_details}>
                                     <span>Items:</span>
                                     <span>₹{calculateTotalItemprice(state?.orderTotal)}.00</span>
                                 </div>
-                                <div className={style.space}>
+                                <div className={style.order_total_details}>
                                     <span>Delivery</span>
                                     <span>₹45.00</span>
                                 </div>
                             </div>
                         </div>
                         <hr />
-                        <div className={style.space}>
+                        <div className={style.order_total_details}>
                             <h3 className={style.h3}>Order Total:</h3>
                             <h3 className={style.h3}>₹{state?.orderTotal}.00</h3>
                         </div>

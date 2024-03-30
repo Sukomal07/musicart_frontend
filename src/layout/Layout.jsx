@@ -3,6 +3,7 @@ import { isMobile } from 'react-device-detect'
 import Footer from "../components/Footer"
 import Header from "../components/Header"
 import MobileHeader from '../components/MobileHeader'
+import MobileNavbar from '../components/MobileNavbar'
 import Navbar from "../components/Navbar"
 
 
@@ -13,12 +14,18 @@ function Layout({ children }) {
                 isMobile ? <MobileHeader /> : <Header />
             }
             {
-                !isMobile && (
+                isMobile ? (
+                    <MobileNavbar />
+                ) : (
                     <Navbar />
                 )
             }
             {children}
-            <Footer />
+            {
+                !isMobile && (
+                    <Footer />
+                )
+            }
         </div>
     )
 }

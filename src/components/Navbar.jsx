@@ -14,7 +14,7 @@ function Navbar() {
     const dispatch = useDispatch()
     const { state } = location || {};
     const { data } = useSelector((state) => state.auth)
-    const { totalCartCount } = useSelector((state) => state.cart?.cart) || 0;
+    const { totalCartCount } = useSelector((state) => state.cart?.cart) || {};
 
     let timeoutId;
     const handleMouseOver = () => {

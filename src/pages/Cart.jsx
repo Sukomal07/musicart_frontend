@@ -1,4 +1,6 @@
+import { Icon } from "@iconify/react";
 import React, { useEffect, useState } from "react";
+import { isMobile } from 'react-device-detect'
 import { HiChevronDown, HiChevronUp, HiOutlineShoppingBag } from "react-icons/hi2";
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -54,11 +56,23 @@ function Cart() {
     return (
         <Layout>
             <section className={style.cart_container}>
-                <span onClick={() => navigate('/')} className={style.back_btn}>Back to products</span>
-                <div className={style.my_cart}>
-                    <HiOutlineShoppingBag size={30} />
-                    <span>My Cart</span>
-                </div>
+                {
+                    isMobile ? (
+                        <span onClick={() => navigate('/')} className={style.back_btn}>
+                            <Icon icon="mdi:arrow-left" color='black' width={30} fontWeight={600} />
+                        </span>
+                    ) : (
+                        <span onClick={() => navigate('/')} className={style.back_btn}>Back to products</span>
+                    )
+                }
+                {
+                    !isMobile && (
+                        <div className={style.my_cart}>
+                            <HiOutlineShoppingBag size={30} />
+                            <span>My Cart</span>
+                        </div>
+                    )
+                }
                 <div className={style.cart_details_container}>
                     <div className={style.cart_details}>
                         <div className={style.all_product}>
@@ -75,11 +89,11 @@ function Cart() {
                                                     <td className={style.product_colour}> Colour: {item?.colour}</td>
                                                     <td className={style.product_colour}>In Stock</td>
                                                 </tr>
-                                                <tr className={style.tr}>
+                                                <tr className={isMobile ? style.flex : style.tr}>
                                                     <th>Price</th>
                                                     <td>₹{item?.price}</td>
                                                 </tr>
-                                                <tr className={style.tr}>
+                                                <tr className={isMobile ? style.flex : style.tr}>
                                                     <th>Quantity</th>
                                                     <td>
                                                         <div className={style.quantity} onClick={() => handleToggleDropdown(item?._id)}>
@@ -98,7 +112,7 @@ function Cart() {
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                <tr className={style.tr}>
+                                                <tr className={isMobile ? style.flex : style.tr}>
                                                     <th>Total</th>
                                                     <td>₹{item?.totalItemPrice}</td>
                                                 </tr>
@@ -109,22 +123,28 @@ function Cart() {
                                 </div>
                             ))}
                         </div>
-                        <div className={style.total_amount}>
-                            {
-                                cart?.items && (
-                                    <h3>{cart?.items?.length} Item</h3>
-                                )
-                            }
-                            {
-                                cart?.totalCartPrice && (
-                                    <h3>₹{cart?.totalCartPrice}</h3>
-                                )
-                            }
-                        </div>
+                        {
+                            !isMobile && (
+                                <div className={style.total_amount}>
+                                    {
+                                        cart?.items && (
+                                            <h3>{cart?.items?.length} Item</h3>
+                                        )
+                                    }
+                                    {
+                                        cart?.totalCartPrice && (
+                                            <h3>₹{cart?.totalCartPrice}</h3>
+                                        )
+                                    }
+                                </div>
+                            )
+                        }
                     </div>
                     <div className={style.price_details}>
                         <div className={style.charge}>
-                            <h4 >PRICE DETAILS</h4>
+                            {!isMobile && (
+                                <h4 >PRICE DETAILS</h4>
+                            )}
                             <div className={style.flex}>
                                 <p>Total MRP</p>
                                 {

@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react'
 import { useEffect } from 'react'
+import { isMobile } from 'react-device-detect'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,8 +27,25 @@ function Invoices() {
     return (
         <Layout>
             <section className={style.container}>
-                <span onClick={() => navigate('/')} className={style.back_btn}>Back to home</span>
-                <h2 style={{ textAlign: 'center' }}>My Invoices</h2>
+                {
+                    isMobile ? (
+                        <span onClick={() => navigate('/')} className={style.back_btn}>
+                            <Icon icon="mdi:arrow-left" color='black' width={30} fontWeight={600} />
+                        </span>
+                    ) : (
+                        <span onClick={() => navigate('/')} className={style.back_btn}>Back to home</span>
+                    )
+                }
+                {
+                    isMobile ? (
+                        <div className={style.invoice}>
+                            <Icon icon="mdi:invoice-edit" width={30} color='black' />
+                            <h2>My Invoices</h2>
+                        </div>
+                    ) : (
+                        <h2 style={{ textAlign: 'center' }}>My Invoices</h2>
+                    )
+                }
                 <div className={style.all_invoice}>
                     {invoices && invoices.map((invoice) => (
                         <div key={invoice?._id} className={style.invoice_container}>

@@ -1,10 +1,13 @@
+import { Icon } from '@iconify/react'
 import { useState } from "react"
+import { isMobile } from 'react-device-detect'
 import { VscChevronDown, VscChevronUp } from "react-icons/vsc"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
 import Successfull from "../components/Successfull"
 import Layout from '../layout/Layout'
+import { getCart } from '../redux/slices/CartSlice'
 import { checkout } from "../redux/slices/InvoiceSlice"
 import style from '../styles/checkout.module.css'
 
@@ -97,6 +100,7 @@ function Checkout() {
                     orderTotal: 0
                 })
                 setSuccess(true)
+                await dispatch(getCart())
             }
         } else {
             setErrors(newErrors)
@@ -105,9 +109,17 @@ function Checkout() {
     return (
         <Layout>
             <section className={style.checkout_container}>
-                <span onClick={() => navigate('/cart')} className={style.back_btn}>Back to cart</span>
+                {
+                    isMobile ? (
+                        <span onClick={() => navigate('/cart')} className={style.back_btn}>
+                            <Icon icon="mdi:arrow-left" color='black' width={30} fontWeight={600} />
+                        </span>
+                    ) : (
+                        <span onClick={() => navigate('/cart')} className={style.back_btn}>Back to cart</span>
+                    )
+                }
                 <h2 className={style.checkout}>Checkout</h2>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex' }} className={style.address_container}>
                     <div className={style.checkout_details}>
                         <div className={style.user_details}>
                             <div className={style.space}>
@@ -159,38 +171,53 @@ function Checkout() {
                                 </div>
                             </div>
                         </div>
-                        <div className={style.bottom_div}>
-                            <span className={style.btn} onClick={handleCheckout}>Place your order</span>
-                            <div style={{ fontSize: '13px' }}>
-                                <h3 className={style.h3}>Order Total : ₹{calculateTotal(totalCartPrice)} </h3>
-                                <p>By placing your order, you agree to Musicart privacy notice and conditions of use.</p>
+                        {!isMobile && (
+                            <div className={style.bottom_div}>
+                                <span className={style.btn} onClick={handleCheckout}>Place your order</span>
+                                <div style={{ fontSize: '13px' }}>
+                                    <h3 className={style.h3}>Order Total : ₹{calculateTotal(totalCartPrice)} </h3>
+                                    <p>By placing your order, you agree to Musicart privacy notice and conditions of use.</p>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                     <div className={style.order_total}>
-                        <div className={style.btn_container}>
-                            <span className={style.btn} onClick={handleCheckout}>Place your order</span>
-                            <p className={style.term}>By placing your order, you agree to Musicart privacy notice and conditions of use.</p>
-                        </div>
-                        <hr />
+                        {!isMobile && (
+                            <div className={style.btn_container}>
+                                <span className={style.btn} onClick={handleCheckout}>Place your order</span>
+                                <p className={style.term}>By placing your order, you agree to Musicart privacy notice and conditions of use.</p>
+                            </div>
+                        )}
+                        {
+                            !isMobile && (
+                                <hr />
+                            )
+                        }
                         <div className={style.order_summary}>
                             <h3>Order Summary</h3>
                             <div className={style.price_div}>
-                                <div className={style.space}>
+                                <div className={style.order_total_details}>
                                     <span>Items:</span>
                                     <span>₹{totalCartPrice}.00</span>
                                 </div>
-                                <div className={style.space}>
+                                <div className={style.order_total_details}>
                                     <span>Delivery</span>
                                     <span>₹45.00</span>
                                 </div>
                             </div>
                         </div>
                         <hr />
-                        <div className={style.space}>
+                        <div className={style.order_total_details}>
                             <h3 className={style.h3}>Order Total:</h3>
                             <h3 className={style.h3}>₹{calculateTotal(totalCartPrice)}.00</h3>
                         </div>
+                        <hr />
+                        {isMobile && (
+                            <div className={style.btn_container}>
+                                <p className={style.term}>By placing your order, you agree to Musicart privacy notice and conditions of use.</p>
+                                <span className={style.btn} onClick={handleCheckout}>Place your order</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

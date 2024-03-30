@@ -23,6 +23,7 @@ function Home() {
     const [query, setQuery] = useState('');
     const [debouncedQuery] = useDebounce(query, 200);
     const { data } = useSelector((state) => state.auth)
+    const { product } = useSelector((state) => state.product) || []
     const [showDropdowns, setShowDropdowns] = useState({
         headphoneTypes: false,
         company: false,
@@ -37,7 +38,6 @@ function Home() {
         price: '',
         sortBy: ''
     });
-    const [product, setProduct] = useState([])
     const [view, setView] = useState('grid');
 
     const handleSelect = (filter, value) => {
@@ -85,12 +85,9 @@ function Home() {
         };
         Object.keys(filters).forEach((key) => filters[key] === '' && delete filters[key]);
         if (Object.keys(filters).length > 0) {
-            const res = await dispatch(filterProducts(filters));
-            const filteredProducts = res?.payload?.data;
-            setProduct(filteredProducts?.length > 0 ? filteredProducts : null);
+            await dispatch(filterProducts(filters));
         } else {
-            const res = await dispatch(getAllProduct());
-            setProduct(res?.payload?.data);
+            await dispatch(getAllProduct());
         }
     };
 
@@ -116,14 +113,12 @@ function Home() {
     useEffect(() => {
         if (debouncedQuery) {
             const fetchData = async () => {
-                const res = await dispatch(searchProduct(debouncedQuery));
-                setProduct(res?.payload?.data);
+                await dispatch(searchProduct(debouncedQuery));
             };
             fetchData();
         } else {
             const fetchData = async () => {
-                const res = await dispatch(getAllProduct());
-                setProduct(res?.payload?.data);
+                await dispatch(getAllProduct());
             };
             fetchData();
         }
@@ -321,7 +316,13 @@ function Home() {
                             <div className={view === 'grid' ? style.image_container : style.list_image_container}>
                                 <img src={item?.pictures[0]} alt={item?.name} className={view === 'grid' ? style.product_image : style.list_product_image} />
                                 <div className={style.cart} onClick={(event) => handleSelectProduct(event, item?._id)}>
-                                    <MdAddShoppingCart size={20} color="#1d7000" />
+                                    {
+                                        isMobile ? (
+                                            <MdAddShoppingCart size={15} color="#1d7000" />
+                                        ) : (
+                                            <MdAddShoppingCart size={20} color="#1d7000" />
+                                        )
+                                    }
                                 </div>
                             </div>
                             <div className={view === 'grid' ? style.grid_product_details : style.list_product_details}>
@@ -343,7 +344,11 @@ function Home() {
                     )}
                 </div>
             </section>
-            <Feedback />
+            {
+                !isMobile && (
+                    <Feedback />
+                )
+            }
         </Layout>
     )
 }
